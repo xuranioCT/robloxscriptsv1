@@ -2,9 +2,7 @@ local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 
-local runSpeed = 32
-local normalSpeed = 16
-local running = false
+-- Variables de punto
 
 -- Create ScreenGui
 local screenGui = Instance.new("ScreenGui")
@@ -28,96 +26,57 @@ logoButton.BackgroundTransparency = 1
 logoButton.Image = "rbxassetid://13762329877" -- Puedes cambiar el assetId por tu logo
 logoButton.Parent = mainFrame
 
--- Run button (circular)
-local runButton = Instance.new("TextButton")
-runButton.Size = UDim2.new(0, 60, 0, 60)
-runButton.Position = UDim2.new(0, 70, 0, 10)
-runButton.Text = "Run"
-runButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-runButton.TextColor3 = Color3.new(1,1,1)
-runButton.Font = Enum.Font.GothamBold
-runButton.TextSize = 18
-runButton.Parent = mainFrame
-runButton.BorderSizePixel = 0
-runButton.AutoButtonColor = true
-runButton.ClipsDescendants = true
-runButton.ZIndex = 2
-runButton.BackgroundTransparency = 0.2
-runButton.AnchorPoint = Vector2.new(0,0)
-runButton.SizeConstraint = Enum.SizeConstraint.RelativeYY
-runButton.UICorner = Instance.new("UICorner", runButton)
-runButton.UICorner.CornerRadius = UDim.new(1,0)
 
--- Speed percent bar
-local speedBar = Instance.new("Frame")
-speedBar.Size = UDim2.new(0, 70, 0, 12)
-speedBar.Position = UDim2.new(0, 140, 0, 24)
-speedBar.BackgroundColor3 = Color3.fromRGB(200,200,200)
-speedBar.Parent = mainFrame
-speedBar.BorderSizePixel = 0
-speedBar.UICorner = Instance.new("UICorner", speedBar)
-speedBar.UICorner.CornerRadius = UDim.new(0.5,0)
+-- Set Point button
+local setPointButton = Instance.new("TextButton")
+setPointButton.Size = UDim2.new(0, 90, 0, 30)
+setPointButton.Position = UDim2.new(0, 70, 0, 15)
+setPointButton.Text = "Set Point"
+setPointButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+setPointButton.TextColor3 = Color3.new(1,1,1)
+setPointButton.Font = Enum.Font.GothamBold
+setPointButton.TextSize = 16
+setPointButton.Parent = mainFrame
+setPointButton.BorderSizePixel = 0
+setPointButton.AutoButtonColor = true
+setPointButton.ZIndex = 2
+setPointButton.BackgroundTransparency = 0.2
+setPointButton.UICorner = Instance.new("UICorner", setPointButton)
+setPointButton.UICorner.CornerRadius = UDim.new(0.5,0)
 
-local fillBar = Instance.new("Frame")
-fillBar.Size = UDim2.new((runSpeed-normalSpeed)/84, 0, 1, 0) -- 100 max speed
-fillBar.Position = UDim2.new(0,0,0,0)
-fillBar.BackgroundColor3 = Color3.fromRGB(0,170,255)
-fillBar.Parent = speedBar
-fillBar.BorderSizePixel = 0
-fillBar.UICorner = Instance.new("UICorner", fillBar)
-fillBar.UICorner.CornerRadius = UDim.new(0.5,0)
+-- TP Point button
+local tpPointButton = Instance.new("TextButton")
+tpPointButton.Size = UDim2.new(0, 90, 0, 30)
+tpPointButton.Position = UDim2.new(0, 70, 0, 50)
+tpPointButton.Text = "TP Point"
+tpPointButton.BackgroundColor3 = Color3.fromRGB(0, 255, 120)
+tpPointButton.TextColor3 = Color3.new(1,1,1)
+tpPointButton.Font = Enum.Font.GothamBold
+tpPointButton.TextSize = 16
+tpPointButton.Parent = mainFrame
+tpPointButton.BorderSizePixel = 0
+tpPointButton.AutoButtonColor = true
+tpPointButton.ZIndex = 2
+tpPointButton.BackgroundTransparency = 0.2
+tpPointButton.UICorner = Instance.new("UICorner", tpPointButton)
+tpPointButton.UICorner.CornerRadius = UDim.new(0.5,0)
 
-local percentLabel = Instance.new("TextLabel")
-percentLabel.Size = UDim2.new(0, 70, 0, 16)
-percentLabel.Position = UDim2.new(0, 140, 0, 40)
-percentLabel.BackgroundTransparency = 1
-percentLabel.Text = "Velocidad: " .. math.floor((runSpeed-normalSpeed)/84*100) .. "%"
-percentLabel.TextColor3 = Color3.new(1,1,1)
-percentLabel.Font = Enum.Font.Gotham
-percentLabel.TextSize = 14
-percentLabel.Parent = mainFrame
 
--- Slider to change speed
-local slider = Instance.new("TextButton")
-slider.Size = UDim2.new(0, 70, 0, 12)
-slider.Position = UDim2.new(0, 140, 0, 24)
-slider.BackgroundTransparency = 1
-slider.Text = ""
-slider.Parent = mainFrame
-slider.ZIndex = 3
 
-local maxSpeed = 100
-local minSpeed = normalSpeed
-
-slider.MouseButton1Down:Connect(function(x, y)
-    local mouse = game:GetService("Players").LocalPlayer:GetMouse()
-    local conn
-    conn = mouse.Move:Connect(function()
-        local relX = math.clamp(mouse.X - speedBar.AbsolutePosition.X, 0, speedBar.AbsoluteSize.X)
-        local percent = relX / speedBar.AbsoluteSize.X
-        runSpeed = math.floor(minSpeed + percent * (maxSpeed-minSpeed))
-        fillBar.Size = UDim2.new(percent, 0, 1, 0)
-        percentLabel.Text = "Velocidad: " .. math.floor(percent*100) .. "%"
-        if running then
-            humanoid.WalkSpeed = runSpeed
-        end
-    end)
-    mouse.Button1Up:Connect(function()
-        if conn then conn:Disconnect() end
-    end)
+-- Set/TP Point logic
+local savedPoint = nil
+setPointButton.MouseButton1Click:Connect(function()
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        savedPoint = character.HumanoidRootPart.Position
+        setPointButton.Text = "Punto Guardado"
+        wait(1)
+        setPointButton.Text = "Set Point"
+    end
 end)
 
--- Run button logic (bypass humanoid speed limit)
-runButton.MouseButton1Click:Connect(function()
-    running = not running
-    if running then
-        humanoid:SetAttribute("WalkSpeed", runSpeed)
-        humanoid.WalkSpeed = runSpeed
-        runButton.Text = "Stop"
-    else
-        humanoid:SetAttribute("WalkSpeed", normalSpeed)
-        humanoid.WalkSpeed = normalSpeed
-        runButton.Text = "Run"
+tpPointButton.MouseButton1Click:Connect(function()
+    if savedPoint and character and character:FindFirstChild("HumanoidRootPart") then
+        character.HumanoidRootPart.CFrame = CFrame.new(savedPoint)
     end
 end)
 
@@ -161,11 +120,9 @@ game:GetService("UserInputService").InputEnded:Connect(function(input)
     end
 end)
 
--- Reset speed if character respawns
+
+-- Actualizar referencias al respawnear
 player.CharacterAdded:Connect(function(char)
     character = char
     humanoid = character:WaitForChild("Humanoid")
-    humanoid.WalkSpeed = normalSpeed
-    running = false
-    runButton.Text = "Run"
 end)
