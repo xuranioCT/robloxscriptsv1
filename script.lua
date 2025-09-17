@@ -44,22 +44,22 @@ setPointButton.BackgroundTransparency = 0.2
 setPointButton.UICorner = Instance.new("UICorner", setPointButton)
 setPointButton.UICorner.CornerRadius = UDim.new(0.5,0)
 
--- TP Point button
 local tpPointButton = Instance.new("TextButton")
-tpPointButton.Size = UDim2.new(0, 90, 0, 30)
-tpPointButton.Position = UDim2.new(0, 70, 0, 50)
-tpPointButton.Text = "TP Point"
-tpPointButton.BackgroundColor3 = Color3.fromRGB(0, 255, 120)
-tpPointButton.TextColor3 = Color3.new(1,1,1)
+tpPointButton.Size = UDim2.new(0, 200, 0, 40)
+tpPointButton.Position = UDim2.new(0, 10, 0, 50)
+tpPointButton.Text = "TP Point x1000"
+tpPointButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+tpPointButton.TextColor3 = Color3.new(1,1,0)
 tpPointButton.Font = Enum.Font.GothamBold
-tpPointButton.TextSize = 16
+tpPointButton.TextSize = 22
 tpPointButton.Parent = mainFrame
-tpPointButton.BorderSizePixel = 0
+tpPointButton.BorderSizePixel = 2
 tpPointButton.AutoButtonColor = true
-tpPointButton.ZIndex = 2
-tpPointButton.BackgroundTransparency = 0.2
-tpPointButton.UICorner = Instance.new("UICorner", tpPointButton)
-tpPointButton.UICorner.CornerRadius = UDim.new(0.5,0)
+tpPointButton.ZIndex = 10
+tpPointButton.BackgroundTransparency = 0.1
+local tpCorner = Instance.new("UICorner", tpPointButton)
+tpCorner.CornerRadius = UDim.new(0.5,0)
+tpPointButton.Visible = true
 
 
 
@@ -88,14 +88,17 @@ end)
 
 tpPointButton.MouseButton1Click:Connect(function()
     if savedPoint and character and character:FindFirstChild("HumanoidRootPart") then
-        character.HumanoidRootPart.CFrame = CFrame.new(savedPoint)
+        for i = 1, 1000 do
+            character.HumanoidRootPart.CFrame = CFrame.new(savedPoint)
+        end
     end
 end)
 
 -- Minimize/maximize logic y arrastre
 local minimized = false
 local dragging = false
-local dragInput, dragStart, startPos
+local dragStart, startPos
+local UIS = game:GetService("UserInputService")
 
 logoButton.MouseButton1Click:Connect(function()
     minimized = not minimized
@@ -108,22 +111,27 @@ logoButton.MouseButton1Click:Connect(function()
     end
 end)
 
+mainFrame.MouseEnter:Connect(function()
+    mainFrame.Active = true
+end)
+
 mainFrame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = true
-        dragStart = input.Position
+        dragStart = UIS:GetMouseLocation()
         startPos = mainFrame.Position
     end
 end)
 
-mainFrame.InputChanged:Connect(function(input)
+UIS.InputChanged:Connect(function(input)
     if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
+        local mousePos = UIS:GetMouseLocation()
+        local delta = mousePos - dragStart
         mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
 
-game:GetService("UserInputService").InputEnded:Connect(function(input)
+UIS.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = false
     end
