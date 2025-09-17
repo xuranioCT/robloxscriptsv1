@@ -18,7 +18,7 @@ mainFrame.Position = UDim2.new(0.5, -110, 0.5, -40)
 mainFrame.BackgroundTransparency = 1
 mainFrame.Parent = screenGui
 mainFrame.Active = true
-mainFrame.Draggable = true
+mainFrame.Draggable = false -- Usaremos lógica personalizada para arrastrar
 
 -- Circular logo button (minimize/maximize)
 local logoButton = Instance.new("ImageButton")
@@ -121,8 +121,11 @@ runButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Minimize/maximize logic
+-- Minimize/maximize logic y arrastre
 local minimized = false
+local dragging = false
+local dragInput, dragStart, startPos
+
 logoButton.MouseButton1Click:Connect(function()
     minimized = not minimized
     for _, v in ipairs(mainFrame:GetChildren()) do
@@ -134,6 +137,27 @@ logoButton.MouseButton1Click:Connect(function()
         mainFrame.Size = UDim2.new(0, 60, 0, 60)
     else
         mainFrame.Size = UDim2.new(0, 220, 0, 80)
+    end
+end)
+
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+    end
+end)
+
+mainFrame.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+game:GetService("UserInputService").InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
     end
 end)
 
