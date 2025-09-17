@@ -69,7 +69,19 @@ setPointButton.MouseButton1Click:Connect(function()
     if character and character:FindFirstChild("HumanoidRootPart") then
         savedPoint = character.HumanoidRootPart.Position
         setPointButton.Text = "Punto Guardado"
+        -- Mensaje visual
+        local msg = Instance.new("TextLabel")
+        msg.Size = UDim2.new(0, 180, 0, 30)
+        msg.Position = UDim2.new(0.5, -90, 0.5, -70)
+        msg.BackgroundTransparency = 0.3
+        msg.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+        msg.Text = "Set Point Successful!"
+        msg.TextColor3 = Color3.new(1,1,1)
+        msg.Font = Enum.Font.GothamBold
+        msg.TextSize = 18
+        msg.Parent = screenGui
         wait(1)
+        msg:Destroy()
         setPointButton.Text = "Set Point"
     end
 end)
@@ -87,11 +99,8 @@ local dragInput, dragStart, startPos
 
 logoButton.MouseButton1Click:Connect(function()
     minimized = not minimized
-    for _, v in ipairs(mainFrame:GetChildren()) do
-        if v ~= logoButton then
-            v.Visible = not minimized
-        end
-    end
+    setPointButton.Visible = not minimized
+    tpPointButton.Visible = not minimized
     if minimized then
         mainFrame.Size = UDim2.new(0, 60, 0, 60)
     else
